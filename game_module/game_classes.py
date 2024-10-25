@@ -1,10 +1,12 @@
 #%%
-###import packages
 import pandas as pd
 import numpy as np
 
-###ever present object for cards
-# deck, face_up_pile, discard_pile
+### pandas and numpy required
+
+###pandas and numpy required
+### card banks contain dataframes representing the deck, discard, and face up piles
+
 class card_bank:
     def __init__(self,name):
         self.name = name
@@ -32,11 +34,27 @@ class card_bank:
         self.deck = self.deck.drop(list(draw_action.index)).reset_index(drop=True)
         self.face_up_pile = self.face_up_pile.reset_index(drop = True)
 
+class ticket:
+    def __init__(self):
+        self.route_df = pd.DataFrame(columns = ['order','route'])
+        self.base_points = 0 
+        self.in_order_point_bonus = 0
+        self.status = "Incomplete"
+
+class route:
+    def __init__(self,route_code):
+        self.route_code = route_code
+        self.city_list = []
+        self.color = ""
+        self.cost = 0
+        self.points = 0
+
 class player:
     def __init__(self,name):
         self.name = name
         self.hand = pd.DataFrame(columns = ['color','type','harbor','value'])
         self.pieces = pd.DataFrame(columns = ['type'])
+        self.routes = pd.DataFrame(columns = ['city_list','color','cost','points'])
 
     ### actions
     def deal_start_of_game_hand(self,card_bank):
@@ -81,26 +99,8 @@ class player:
 
         print(f'''Number of cards drawn from the face_up_pile: {str(np.shape(new_cards)[0])}''')
         
-class route:
-    def __init__(self):
-        self.city_list = []
-        self.length = 0
-        self.cost = 0
-        self.points = 0
-        self.status = "Incomplete"
 
-class ticket:
-    def __init__(self):
-        self.route_df = pd.DataFrame(columns = ['order','route'])
-        self.base_points = 0 
-        self.in_order_point_bonus = 0
-        self.status = "Incomplete"
 
-# Build a Function To set up the game
-
-### functions
-
-#%%
 class game:
      def __init__(self,name):
         self.name = name
@@ -116,9 +116,11 @@ class game:
 
             ### create the deck from the deck initialization dataframe
             ### for now this is the version of the game we will be testing with, it is the actual specs from the game
-            card_types = pd.DataFrame([['pink','train',False,1,7],
-                            ['yellow','train',False,1,7],
-                            ['wild','train',False,1,7]],
+            card_types = pd.DataFrame([['pink','train',False,1,40],
+                            ['yellow','train',False,1,40],
+                            ['wild','train',False,1,40],
+                            ['pink','ship',False,1,40],
+                            ['yellow','ship',False,1,40]],
                                 columns = ['color','type','harbor','value','quantity'])
 
             for type in card_types.iterrows():
@@ -147,6 +149,8 @@ class game:
                 ### Each single ship card is a harbor card
                 #6 colors of trains x 2 harbor types
                 #1 wild card train type
+
+            route_list = [route]
 
             
             card_types = pd.DataFrame([['pink','train',False,1,7],
@@ -189,18 +193,3 @@ class game:
             
             self.bank.draw_from_deck_to_face_up_pile()
             print(f'''New Standard Game has been created''')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# %%
