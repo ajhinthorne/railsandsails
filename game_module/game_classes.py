@@ -1,12 +1,98 @@
 #%%
 import pandas as pd
 import numpy as np
+import random as rand
 
 ### pandas and numpy required
 
 ###pandas and numpy required
 ### card banks contain dataframes representing the deck, discard, and face up piles
 
+class card:
+    def __init__(self):
+        self.color = ""
+        self.type = ""
+        self.harbor = False
+        self.value = 0
+
+class city:
+    def __init__(self):
+        self.name = ""
+        self.harbor = False
+        self.connections = []
+
+class game_board:
+    def __init__(self):
+        self.name = ""
+
+
+class deck:
+    def __init__(self,name):
+        self.name = name
+        self.cards = []
+
+    def reset_deck(self):
+        self.cards = []
+
+    def initialize_deck_from_data(self,card_csv):
+        card_info = pd.read_csv(card_csv)
+
+        for card_types in card_info.iterrows():
+            for x in range(0,card_types[1]['quantity']):
+                new_card = card()
+                new_card.color = card_types[1]['color']
+                new_card.type = card_types[1]['type']
+                new_card.harbor = card_types[1]['harbor']
+                new_card.value = card_types[1]['value']
+
+                self.cards.append(new_card)
+
+    def output_deck_as_dataframe(self):
+        output_df = pd.DataFrame(columns = ['color','type','harbor','value'])
+
+        for card in self.cards:
+            new_card_df = pd.DataFrame([[card[1]['color'],card[1]['type'],card[1]['harbor'],card[1]['value']]],columns = ['color','type','harbor','value'])
+
+            output_df = pd.concat([output_df,new_card_df])
+
+        return output_df
+
+
+class hand(deck):
+    def __init__(self,deck):
+        self.cards = deck.cards
+
+    def draw_cards_from_draw_deck(self,draw_deck,draw_size):
+        if len(draw_deck.cards) < draw_size:
+            raise ValueError("Not Enough Cards In Deck")
+        
+        new_cards = rand.sample(draw_deck.cards,draw_size)
+
+        self.cards = self.cards + new_cards
+        draw_deck.cards = list(set(draw_deck.cards) - set(new_cards))
+
+    def draw_card_from_face_up_pile(self,face_up_pile):
+        face_up_pile.cards
+
+
+class draw_deck(deck):
+    def __init__(self,deck):
+        self.cards = deck.cards
+
+    def reset_deck_from_discard(self,discard_deck):
+        self.cards = self.cards + discard_deck.cards
+        discard_deck.reset_deck()
+
+class discard_deck(deck):
+    def __init__(self,deck):
+        self.cards = deck.cards
+
+class face_up_pile(deck):
+    def __init__(self,deck):
+        self.cards = deck.cards
+
+
+#%%
 class card_bank:
     def __init__(self,name):
         self.name = name
@@ -40,12 +126,12 @@ class ticket:
         self.base_points = 0 
         self.in_order_point_bonus = 0
         self.status = "Incomplete"
-
 class route:
     def __init__(self,route_code):
         self.route_code = route_code
         self.city_list = []
         self.color = ""
+        self.type = ""
         self.cost = 0
         self.points = 0
 
@@ -193,3 +279,4 @@ class game:
             
             self.bank.draw_from_deck_to_face_up_pile()
             print(f'''New Standard Game has been created''')
+# %%
