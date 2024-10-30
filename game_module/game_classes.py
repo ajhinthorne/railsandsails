@@ -1,12 +1,13 @@
 #%%
 import pandas as pd
 import random as rand
-
+import os
 ### pandas and numpy required
 
 ###pandas and numpy required
 ### card banks contain dataframes representing the deck, discard, and face up piles
 
+#%%
 class city:
     def __init__(self):
         self.name = ""
@@ -179,8 +180,8 @@ class ticket:
 
 class piece:
     def __init__(self):
-        owner = ""
-        type = ""
+        self.owner = ""
+        self.type = ""
 
 class player(hand):
     def __init__(self,name,hand):
@@ -227,33 +228,26 @@ class game(deck,game_board):
 
     ### do we want to create a player dictionary that consists of the player's names?
 
-     def initialize_test_game(self,number_of_players):
+     def initialize_game(self,number_of_players,game_type):
+            
+            if game_type == "world":
+                card_data_path = str(os.getcwd()) + '\\worldcardbank_data.csv'
+                city_data_path = str(os.getcwd()) + '\\worldcity_data.csv'
+                route_data_path = str(os.getcwd()) + '\\worldroute_data.csv'
+            elif game_type == "washington":
+                card_data_path = str(os.getcwd()) + '\\washingtoncardbank_data.csv'
+                city_data_path = str(os.getcwd()) + '\\washingtoncity_data.csv'
+                route_data_path = str(os.getcwd()) + '\\washingtonroute_data.csv'
+
+            self.deck.initialize_deck_from_data(card_data_path)
+            self.game_board.initialize_board_from_data(city_data_path,route_data_path)
 
             if number_of_players < 2 | number_of_players > 5:
                 raise ValueError(f'''Number of players has to be between 2 and 5. Current Number of Players: {number_of_players}''')
 
-            ### create the deck from the deck initialization dataframe
-            ### for now this is the version of the game we will be testing with, it is the actual specs from the game
-            card_types = pd.DataFrame([['pink','train',False,1,40],
-                            ['yellow','train',False,1,40],
-                            ['wild','train',False,1,40],
-                            ['pink','ship',False,1,40],
-                            ['yellow','ship',False,1,40]],
-                                columns = ['color','type','harbor','value','quantity'])
-
-            for type in card_types.iterrows():
-                for x in range(0,type[1]['quantity']):
-                    new_card = pd.DataFrame([[type[1]['color'],type[1]['type'],type[1]['harbor'],type[1]['value']]],columns = ['color','type','harbor','value'])
-                    self.bank.deck = self.bank.deck.append(new_card).reset_index(drop = True)
-
-            for x in range(1,(number_of_players + 1)):
-                new_player = player(f'''player_{x}''')
-                new_player.deal_start_of_game_hand(self.bank)
-                self.player_list.append(new_player)
-                print(f'''{new_player.name} has been added to the player list''')
             
-            self.bank.draw_from_deck_to_face_up_pile()
-            print(f'''New Test Game has been created''')
+
+
 
      def initialize_standard_game(self,number_of_players):
 

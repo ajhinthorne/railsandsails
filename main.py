@@ -8,22 +8,14 @@ from game_module import game_classes as g
 
 #%%
 
-my_new_game = g.game("my_new_game")
-my_new_game.initialize_standard_game(2)
+my_new_game = g.game(g.deck(),g.game_board())
+my_new_game.game_board.initialize_board_from_data()
+my_new_game.deck.initialize_deck_from_data()
 
 
 
 
 
-
-
-
-
-
-
-# %%
-test_df = pd.DataFrame([["Test Name!",["city_a","city_b"]]], columns = ["my_name","my_list"])
-test_df
 
 # %%
 test_df['my_list'].values[0][0]
