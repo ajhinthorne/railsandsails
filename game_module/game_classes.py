@@ -1,5 +1,5 @@
 #%%
-import pandas as pd
+import pandas as pd # type: ignore
 import random as rand
 import os
 ### pandas and numpy required
@@ -66,8 +66,7 @@ class card:
         self.value = 0
 
 class deck:
-    def __init__(self,name):
-        self.name = name
+    def __init__(self):
         self.train_draw_pile = []
         self.ship_draw_pile = []
         self.faceup_pile = []
@@ -177,6 +176,7 @@ class ticket:
         self.cities = []
         self.points = 0
         self.status = "Incomplete"
+        self.order = []
 
 class piece:
     def __init__(self):
@@ -230,6 +230,7 @@ class game(deck,game_board):
 
      def initialize_game(self,number_of_players,game_type):
             
+            ### create the game board from different data sets
             if game_type == "world":
                 card_data_path = str(os.getcwd()) + '\\worldcardbank_data.csv'
                 city_data_path = str(os.getcwd()) + '\\worldcity_data.csv'
@@ -242,24 +243,18 @@ class game(deck,game_board):
             self.deck.initialize_deck_from_data(card_data_path)
             self.game_board.initialize_board_from_data(city_data_path,route_data_path)
 
+            ### check to see if their are a valid number of players
             if number_of_players < 2 | number_of_players > 5:
                 raise ValueError(f'''Number of players has to be between 2 and 5. Current Number of Players: {number_of_players}''')
 
-            
-
-
-
-     def initialize_standard_game(self,number_of_players):
-
-            if number_of_players < 2 | number_of_players > 5:
-                raise ValueError(f'''Number of players has to be between 2 and 5. Current Number of Players: {number_of_players}''')
-
-            for x in range(1,(number_of_players + 1)):
-                new_player = player(f'''player_{x}''')
-                new_player.deal_start_of_game_hand(self.bank)
+            ### deal out a new hand to each of the players
+            for x in range(0,number_of_players):
+                new_player = player(f'''player_{x+1}''',hand = hand())
+                self.deck.deal_start_of_game_hand_to_player(new_player)
                 self.player_list.append(new_player)
                 print(f'''{new_player.name} has been added to the player list''')
-            
-            self.bank.draw_from_deck_to_face_up_pile()
-            print(f'''New Standard Game has been created''')
+
+            ### build the face up pile
+            self.deck.initialize_faceup_pile()
+
 # %%
