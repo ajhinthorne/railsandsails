@@ -221,7 +221,7 @@ class player(hand):
             new_piece.type = "harbor"
      
 class game(deck,game_board):
-     def __init__(self):
+     def __init__(self,deck,game_board):
         self.deck = deck
         self.game_board = game_board
         self.player_list = []
