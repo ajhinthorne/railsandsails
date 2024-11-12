@@ -43,18 +43,18 @@ class game_board:
 
             self.cities.append(new_city)
         
-        for route in route_info.iterrows():
-            new_route = route(route[1]['route_code'])
-            new_route.city_list = [route[1]['city_a'],route[1]['city_b']]
-            new_route.color = route[1]['color']
-            new_route.type = route[1]['type']
-            new_route.cost = route[1]['cost']
-            new_route.length = route[1]['length']
-            new_route.points = route[1]['points']
+        for info in route_info.iterrows():
+            new_route = route(info[1]['route_code'])
+            new_route.city_list = [info[1]['city_a'],info[1]['city_b']]
+            new_route.color = info[1]['color']
+            new_route.type = info[1]['type']
+            new_route.cost = info[1]['cost']
+            new_route.length = info[1]['length']
+            new_route.points = info[1]['points']
 
             ###appending city connections to each of the cities
-            [city for city in self.cities if city.name == route[1]['city_a']][0].connections.append(route[1]['city_b'])
-            [city for city in self.cities if city.name == route[1]['city_b']][0].connections.append(route[1]['city_a'])
+            [city for city in self.cities if city.name == info[1]['city_a']][0].connections.append(info[1]['city_b'])
+            [city for city in self.cities if city.name == info[1]['city_b']][0].connections.append(info[1]['city_a'])
 
             self.routes.append(new_route)
 
