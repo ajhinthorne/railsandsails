@@ -232,13 +232,13 @@ class game(deck,game_board):
             
             ### create the game board from different data sets
             if game_type == "world":
-                card_data_path = str(os.getcwd()) + '\\worldcardbank_data.csv'
-                city_data_path = str(os.getcwd()) + '\\worldcity_data.csv'
-                route_data_path = str(os.getcwd()) + '\\worldroute_data.csv'
+                card_data_path = str(os.getcwd()) + '\\game_module\\worldcardbank_data.csv'
+                city_data_path = str(os.getcwd()) + '\\game_module\\worldcity_data.csv'
+                route_data_path = str(os.getcwd()) + '\\game_module\\worldroute_data.csv'
             elif game_type == "washington":
-                card_data_path = str(os.getcwd()) + '\\washingtoncardbank_data.csv'
-                city_data_path = str(os.getcwd()) + '\\washingtoncity_data.csv'
-                route_data_path = str(os.getcwd()) + '\\washingtonroute_data.csv'
+                card_data_path = str(os.getcwd()) + '\\game_module\\washingtoncardbank_data.csv'
+                city_data_path = str(os.getcwd()) + '\\game_module\\washingtoncity_data.csv'
+                route_data_path = str(os.getcwd()) + '\\game_module\\washingtonroute_data.csv'
 
             self.deck.initialize_deck_from_data(card_data_path)
             self.game_board.initialize_board_from_data(city_data_path,route_data_path)
