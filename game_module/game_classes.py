@@ -36,7 +36,7 @@ class game_board:
         city_info = pd.read_csv(city_csv)
         route_info = pd.read_csv(route_csv)
 
-        for info in city_info:
+        for info in city_info.iterrows():
             new_city = city()
             new_city.name = info[1]["name"]
             new_city.harbor = info[1]["harbor"]
