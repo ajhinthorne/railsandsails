@@ -43,7 +43,7 @@ class game_board:
 
             self.cities.append(new_city)
         
-        for route in route_info:
+        for route in route_info.iterrows():
             new_route = route(route[1]['route_code'])
             new_route.city_list = [route[1]['city_a'],route[1]['city_b']]
             new_route.color = route[1]['color']
