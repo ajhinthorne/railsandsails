@@ -53,8 +53,11 @@ class game_board:
             new_route.points = info[1]['points']
 
             ###appending city connections to each of the cities
-            [city for city in self.cities if city.name == info[1]['city_a']].connections.append(info[1]['city_b'])
-            [city for city in self.cities if city.name == info[1]['city_b']].connections.append(info[1]['city_a'])
+            try:
+                [city for city in self.cities if city.name == info[1]['city_a']][0].connections.append(info[1]['city_b'])
+                [city for city in self.cities if city.name == info[1]['city_b']][0].connections.append(info[1]['city_a'])
+            except:
+                print(f'''Could not find {info[1]['city_a']} or {info[1]['city_b']} in city list''')
 
             self.routes.append(new_route)
 
