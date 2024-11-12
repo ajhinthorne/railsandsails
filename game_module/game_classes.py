@@ -36,10 +36,10 @@ class game_board:
         city_info = pd.read_csv(city_csv)
         route_info = pd.read_csv(route_csv)
 
-        for city_info in city_info:
+        for info in city_info:
             new_city = city()
-            new_city.name = city_info[1]["name"]
-            new_city.harbor = city_info[1]["harbor"]
+            new_city.name = info[1]["name"]
+            new_city.harbor = info[1]["harbor"]
 
             self.cities.append(new_city)
         
