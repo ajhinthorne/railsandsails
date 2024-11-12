@@ -1,5 +1,6 @@
 #%%
 import pandas as pd # type: ignore
+import numpy as np
 import random as rand
 import os
 ### pandas and numpy required
@@ -60,7 +61,19 @@ class game_board:
                 print(f'''Could not find {info[1]['city_a']} or {info[1]['city_b']} in city list''')
 
             self.routes.append(new_route)
+    
+    def show_available_routes(self):
+        available_route_df = pd.DataFrame(columns = ["route_code","color","type","cost","length","points"])
 
+        for route in self.routes:
+            if route.owner == "":
+                new_route = pd.DataFrame([[route.route_code,route.color,route.type,route.cost,route.length,route.points]],
+                                         columns = ["route_code","color","type","cost","length","points"])
+                
+                available_route_df = pd.concat([available_route_df,new_route]).reset_index(drop = True)
+
+        return available_route_df      
+        
 class card:
     def __init__(self):
         self.color = ""
@@ -154,14 +167,23 @@ class hand():
     def __init__(self):
         self.cards = []
 
-    def draw_cards_from_draw_deck(self,deck,draw_size):
-        if len(deck.draw_pile) < draw_size:
+    def draw_ship_cards_from_draw_deck(self,deck,draw_size):
+        if len(deck.ship_draw_pile) < draw_size:
             deck.reset_deck_from_discard() 
         
-        new_cards = rand.sample(deck.draw_pile,draw_size)
+        new_cards = rand.sample(deck.ship_draw_pile,draw_size)
 
-        self.cards = self.cards + new_cards
-        deck.draw_pile = list(set(deck.draw_pile) - set(new_cards))
+        self.cards += new_cards
+        deck.ship_draw_pile = list(set(deck.ship_draw_pile) - set(new_cards))       
+
+    def draw_train_cards_from_draw_deck(self,deck,draw_size):
+        if len(deck.train_draw_pile) < draw_size:
+            deck.reset_deck_from_discard() 
+        
+        new_cards = rand.sample(deck.train_draw_pile,draw_size)
+
+        self.cards += new_cards
+        deck.train_draw_pile = list(set(deck.train_draw_pile) - set(new_cards))  
 
     def choose_one_card_from_face_up_pile(self,deck,card,type):
         self.cards = self.cards + card
@@ -192,6 +214,7 @@ class player(hand):
         self.hand = hand
         self.pieces = []
         self.routes = []
+        self.harbors = []
 
     ### 20 trains and 40 ships is the recommended distribution
     def choose_piece_distribution(self,trains = 20, ships = 40):
@@ -222,7 +245,66 @@ class player(hand):
             new_piece = piece()
             new_piece.owner = self.name
             new_piece.type = "harbor"
-     
+
+            self.pieces.append(new_piece)
+
+    ### functions that allow a player to show their hand + pieces
+    def show_hand(self):
+        ### this function allows a dev to show a player hand in the interactive
+        card_df = pd.DataFrame(columns = ["color","type","harbor","value"])
+        for card in self.hand.cards:
+            new_card = pd.DataFrame([[card.color,card.type,card.harbor,card.value]],columns = ["color","type","harbor","value"])
+            card_df = pd.concat([card_df,new_card]).reset_index(drop=True)
+
+        card_summary = card_df.groupby(['color','type','harbor','value']).size().reset_index()
+        return card_summary.rename(columns = {0:"quantity"})
+    
+    def show_pieces(self):
+        piece_list = [] 
+        for piece in self.pieces:
+            piece_list += [piece.type]
+
+        piece_df = pd.DataFrame(piece_list,columns = ['type'])
+        return piece_df.groupby('type').size().reset_index().rename(columns={0:"quantity"})
+    
+    def calculate_points(self):
+        total_points = 0
+        for route in self.routes():
+            total_points += route.points
+
+        return total_points
+
+    def determine_playable_routes(self,available_routes):
+        playable_routes = []
+        hand_df = self.show_hand()
+        hand_df['total_value'] = hand_df['value'] * hand_df['quantity']
+        hand_to_route_df = hand_df[['color','type','total_value']].groupby(['color']).sum('total_value').reset_index()
+        
+        for route in available_routes:
+            if np.shape(hand_to_route_df[(hand_to_route_df['color'] == route.color) & (hand_to_route_df['type'] == route.type)]) > 0:
+                if route.cost <= hand_to_route_df[(hand_to_route_df['color'] == route.color) & (hand_to_route_df['type'] == route.type)]['cost'].values[0]:
+                    playable_routes += route
+            else:
+                continue
+
+        return playable_routes
+
+    #def deterimine_playable_harbors(self,available_cities):
+
+        
+    
+
+    
+    ### functions that allow a player to execute a turn
+    #def draw_from_deck(self):
+        ### determine card targets
+
+        ### if card target exists in face_up_pile pick up the card
+
+        ### if card target does not exist in face_up_pile draw from a the specific deck
+
+    #def claim_route(self): 
+    
 class game(deck,game_board):
      def __init__(self,deck,game_board):
         self.deck = deck
@@ -254,10 +336,26 @@ class game(deck,game_board):
             for x in range(0,number_of_players):
                 new_player = player(f'''player_{x+1}''',hand = hand())
                 self.deck.deal_start_of_game_hand_to_player(new_player)
+                new_player.choose_piece_distribution()
                 self.player_list.append(new_player)
                 print(f'''{new_player.name} has been added to the player list''')
 
             ### build the face up pile
             self.deck.initialize_faceup_pile()
+    
+     def initialize_turn(self,player):
 
-# %%
+        ### determine a players playable_routes
+        available_routes = []
+        for route in self.game_board.routes:
+            if route.owner == "":
+                available_routes += route
+        
+        playable_routes = player.determine_playable_routes(available_routes)
+
+        return playable_routes
+
+
+
+
+
